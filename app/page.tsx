@@ -54,13 +54,31 @@ async function getDashboardData() {
 }
 
 export default async function Dashboard() {
-  const boardData = await getDashboardData();
+  const rawBoardData = await getDashboardData();
+  
+  // --- NOUVELLE RÈGLE : DÉCOUPAGE AUTO ---
+  const MAX_ITEMS = 12; // Limite par colonne avant de diviser
+  const finalBoardData: Record<string, string[]> = {};
+
+  Object.entries(rawBoardData).forEach(([statut, entreprises]) => {
+    // Si on dépasse la limite, on découpe
+    if (entreprises.length > MAX_ITEMS) {
+      const nbColonnes = Math.ceil(entreprises.length / MAX_ITEMS);
+      for (let i = 0; i < nbColonnes; i++) {
+        // On crée un paquet de 12
+        const chunk = entreprises.slice(i * MAX_ITEMS, (i + 1) * MAX_ITEMS);
+        // On crée le nouveau nom, ex: "NO GO (1/2)"
+        finalBoardData[`${statut} (${i + 1}/${nbColonnes})`] = chunk;
+      }
+    } else {
+      // Sinon on garde la colonne normale
+      finalBoardData[statut] = entreprises;
+    }
+  });
 
   return (
-    // overflow-hidden bloque le scroll global de la page entière
     <main className="h-screen bg-slate-50 p-4 font-sans text-slate-800 overflow-hidden">
       
-      {/* HEADER : Plus compact pour gagner de la place verticale */}
       <header className="mb-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <img src="/logo.png" alt="Avisia Logo" className="h-8 object-contain" />
@@ -75,37 +93,33 @@ export default async function Dashboard() {
         </div>
       </header>
 
-      {/* LE BOARD Kanban : 4 colonnes */}
-      <div className="grid grid-cols-4 gap-4 w-full">
-        {Object.entries(boardData).map(([statut, entreprises]) => (
+      {/* Remplacement de Grid par Flex pour s'adapter au nombre dynamique de colonnes */}
+      <div className="flex flex-row gap-4 w-full h-[calc(100vh-110px)]">
+        {Object.entries(finalBoardData).map(([statut, entreprises]) => (
           
           <div 
             key={statut} 
-            // C'EST ICI LA MAGIE : La colonne s'adapte au millimètre près à ton écran
-            className="bg-slate-200/50 rounded-xl p-3 border border-slate-200/60 flex flex-col h-[calc(100vh-110px)]"
+            // flex-1 permet à chaque colonne de partager la même largeur, peu importe s'il y en a 4, 5 ou 6
+            className="flex-1 bg-slate-200/50 rounded-xl p-3 border border-slate-200/60 flex flex-col min-w-0"
           >
             
             <div className="flex-shrink-0 flex items-center justify-between mb-3 px-1">
-              <h2 className="font-bold text-sm text-slate-800 tracking-wide uppercase">{statut}</h2>
+              <h2 className="font-bold text-sm text-slate-800 tracking-wide uppercase truncate mr-2">{statut}</h2>
               <span className="bg-[#2634E5] text-white text-xs py-0.5 px-2 rounded-full font-bold shadow-sm">
-                {/* @ts-ignore */}
                 {entreprises.length}
               </span>
             </div>
 
-            {/* Liste des entreprises : Plus compacte (gap-2, p-2.5) */}
-            <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-2 pb-2">
-              {/* @ts-ignore */}
-              {entreprises.map((entreprise: any, index: number) => (
+            <div className="flex-1 overflow-hidden flex flex-col gap-2 pb-2">
+              {entreprises.map((entreprise: string, index: number) => (
                 <div
                   key={index}
                   className="bg-white p-2.5 rounded-lg shadow-sm border border-slate-200 flex-shrink-0"
                 >
-                  <p className="font-medium text-sm text-slate-700">{entreprise}</p>
+                  <p className="font-medium text-sm text-slate-700 truncate">{entreprise}</p>
                 </div>
               ))}
               
-              {/* @ts-ignore */}
               {entreprises.length === 0 && (
                 <div className="text-slate-400 text-xs text-center py-4 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50/50">
                   Aucune offre
