@@ -26,7 +26,7 @@ async function getDashboardData() {
     if (!data.results) return board;
 
     // On trie et on filtre
-    data.results.forEach((page) => {
+    data.results.forEach((page: any) => {
       const props = page.properties;
       const nomEntreprise = props['Nom']?.title?.[0]?.plain_text || "Sans nom";
       let statut = props['Phase d’offre']?.status?.name || props['Phase d’offre']?.select?.name || "NEW";
