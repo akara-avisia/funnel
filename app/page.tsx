@@ -20,7 +20,7 @@ async function getDashboardData() {
 
     // On définit uniquement tes 4 nouvelles colonnes
     const colonnes = ["Nouveau", "En cours", "GO", "NO GO"];
-    const board = {};
+    const board: Record<string, string[]> = {};
     colonnes.forEach(col => board[col] = []);
 
     if (!data.results) return board;
