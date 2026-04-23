@@ -59,7 +59,7 @@ export default async function Dashboard() {
   // 👇👇👇 C'EST ICI QUE TU MODIFIES LA HAUTEUR MANUELLEMENT 👇👇👇
   // Modifie "800px" par la valeur de ton choix pour l'adapter à ta TV.
   // Tu peux essayer : "900px", "1000px", ou "85vh" (85% de l'écran).
-  const HAUTEUR_COLONNES = "2000px"; 
+  const HAUTEUR_COLONNES = "4000px"; 
   // 👆👆👆 -------------------------------------------------- 👆👆👆
 
   return (
