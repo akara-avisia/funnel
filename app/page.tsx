@@ -56,64 +56,58 @@ async function getDashboardData() {
 export default async function Dashboard() {
   const boardData = await getDashboardData();
 
-  // 👇👇👇 C'EST ICI QUE TU MODIFIES LA HAUTEUR MANUELLEMENT 👇👇👇
-  // Modifie "800px" par la valeur de ton choix pour l'adapter à ta TV.
-  // Tu peux essayer : "900px", "1000px", ou "85vh" (85% de l'écran).
-  const HAUTEUR_COLONNES = "4000px"; 
-  // 👆👆👆 -------------------------------------------------- 👆👆👆
-
   return (
-    <main className="min-h-screen bg-slate-50 p-6 font-sans text-slate-800">
+    // overflow-hidden bloque le scroll global de la page entière
+    <main className="h-screen bg-slate-50 p-4 font-sans text-slate-800 overflow-hidden">
       
-      {/* HEADER */}
-      <header className="mb-6 bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <img src="/logo.png" alt="Avisia Logo" className="h-10 object-contain" />
-          <div className="h-10 w-px bg-slate-200"></div>
+      {/* HEADER : Plus compact pour gagner de la place verticale */}
+      <header className="mb-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <img src="/logo.png" alt="Avisia Logo" className="h-8 object-contain" />
+          <div className="h-8 w-px bg-slate-200"></div>
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Suivi Pipe Business</h1>
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900">Suivi Pipe Business</h1>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="flex h-2 w-2 rounded-full bg-[#2634E5]"></span>
-          <p className="text-sm text-slate-500">Live Notion</p>
+          <span className="flex h-2 w-2 rounded-full bg-[#2634E5] animate-pulse"></span>
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Live Notion</p>
         </div>
       </header>
 
-      {/* LE BOARD Kanban : 4 colonnes fixes */}
-      <div className="grid grid-cols-4 gap-6 w-full">
+      {/* LE BOARD Kanban : 4 colonnes */}
+      <div className="grid grid-cols-4 gap-4 w-full">
         {Object.entries(boardData).map(([statut, entreprises]) => (
           
           <div 
             key={statut} 
-            className="bg-slate-200/50 rounded-xl p-4 border border-slate-200/60 flex flex-col"
-            // C'est ici que ta variable manuelle est appliquée
-            style={{ height: HAUTEUR_COLONNES }}
+            // C'EST ICI LA MAGIE : La colonne s'adapte au millimètre près à ton écran
+            className="bg-slate-200/50 rounded-xl p-3 border border-slate-200/60 flex flex-col h-[calc(100vh-110px)]"
           >
             
-            <div className="flex-shrink-0 flex items-center justify-between mb-4 px-1">
+            <div className="flex-shrink-0 flex items-center justify-between mb-3 px-1">
               <h2 className="font-bold text-sm text-slate-800 tracking-wide uppercase">{statut}</h2>
-              <span className="bg-[#2634E5] text-white text-xs py-1 px-2.5 rounded-full font-semibold shadow-sm">
+              <span className="bg-[#2634E5] text-white text-xs py-0.5 px-2 rounded-full font-bold shadow-sm">
                 {/* @ts-ignore */}
                 {entreprises.length}
               </span>
             </div>
 
-            {/* Liste des entreprises (avec défilement auto si tu as mis une hauteur trop petite) */}
-            <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-3 pb-2">
+            {/* Liste des entreprises : Plus compacte (gap-2, p-2.5) */}
+            <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-2 pb-2">
               {/* @ts-ignore */}
               {entreprises.map((entreprise: any, index: number) => (
                 <div
                   key={index}
-                  className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex-shrink-0"
+                  className="bg-white p-2.5 rounded-lg shadow-sm border border-slate-200 flex-shrink-0"
                 >
-                  <p className="font-medium text-slate-700">{entreprise}</p>
+                  <p className="font-medium text-sm text-slate-700">{entreprise}</p>
                 </div>
               ))}
               
               {/* @ts-ignore */}
               {entreprises.length === 0 && (
-                <div className="text-slate-400 text-sm text-center py-6 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50/50">
+                <div className="text-slate-400 text-xs text-center py-4 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50/50">
                   Aucune offre
                 </div>
               )}
