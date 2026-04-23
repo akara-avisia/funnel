@@ -1,6 +1,5 @@
 // app/page.tsx
 
-// 1. LA DATA : Fonction pour récupérer, filtrer et renommer les données
 async function getDashboardData() {
   const databaseId = process.env.NOTION_DATABASE_ID;
   const secret = process.env.NOTION_SECRET;
@@ -54,19 +53,17 @@ async function getDashboardData() {
   }
 }
 
-// 2. LE DESIGN : Interface visuelle Responsive
 export default async function Dashboard() {
   const boardData = await getDashboardData();
 
   return (
-    // On adapte le padding (p-4 sur mobile, p-8 sur grand écran)
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
+    // 1. L'écran entier est verrouillé en hauteur (h-screen) sans défilement global (overflow-hidden)
+    <main className="h-screen flex flex-col bg-slate-50 p-4 md:p-6 font-sans text-slate-800 overflow-hidden">
       
-      {/* HEADER AVISIA RESPONSIVE */}
-      <header className="mb-6 md:mb-10 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* 2. L'en-tête garde sa taille fixe (flex-shrink-0) */}
+      <header className="flex-shrink-0 mb-6 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-4 md:gap-6">
-          <img src="/logo.jpg" alt="Avisia Logo" className="h-8 md:h-10 object-contain" />
-          {/* Barre verticale cachée sur mobile */}
+          <img src="/logo.png" alt="Avisia Logo" className="h-8 md:h-10 object-contain" />
           <div className="hidden md:block h-10 w-px bg-slate-200"></div>
           <div>
             <h1 className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">Suivi Pipe Business</h1>
@@ -78,14 +75,14 @@ export default async function Dashboard() {
         </div>
       </header>
 
-      {/* LE BOARD Kanban : Utilisation d'une grille intelligente */}
-      {/* 1 colonne par défaut, 2 sur tablette (md), 4 sur PC/TV (xl) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
+      {/* 3. Le Container de la Grille prend tout l'espace restant (flex-1) */}
+      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {Object.entries(boardData).map(([statut, entreprises]) => (
           
-          <div key={statut} className="bg-slate-200/50 rounded-xl p-4 border border-slate-200/60 w-full h-full">
+          // 4. Chaque colonne est verrouillée en hauteur (h-full, overflow-hidden)
+          <div key={statut} className="bg-slate-200/50 rounded-xl p-4 border border-slate-200/60 flex flex-col h-full overflow-hidden">
             
-            <div className="flex items-center justify-between mb-4 px-1">
+            <div className="flex-shrink-0 flex items-center justify-between mb-4 px-1">
               <h2 className="font-bold text-sm text-slate-800 tracking-wide uppercase">{statut}</h2>
               <span className="bg-[#2634E5] text-white text-xs py-1 px-2.5 rounded-full font-semibold shadow-sm">
                 {/* @ts-ignore */}
@@ -93,12 +90,13 @@ export default async function Dashboard() {
               </span>
             </div>
 
-            <div className="flex flex-col gap-3">
+            {/* 5. C'est ici que ça scrolle ! (overflow-y-auto) */}
+            <div className="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 pb-2">
               {/* @ts-ignore */}
               {entreprises.map((entreprise: any, index: number) => (
                 <div
                   key={index}
-                  className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 transition-all duration-200 cursor-default hover:shadow-md hover:border-[#2634E5] hover:-translate-y-0.5 group"
+                  className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 transition-all duration-200 cursor-default hover:shadow-md hover:border-[#2634E5] hover:-translate-y-0.5 group flex-shrink-0"
                 >
                   <p className="font-medium text-slate-700 group-hover:text-[#2634E5] transition-colors">{entreprise}</p>
                 </div>
