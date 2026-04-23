@@ -48,7 +48,7 @@ async function getDashboardData() {
 
     return board;
   } catch (error) {
-    console.error("Erreur de récupération :", error);
+    console.error("Erreur :", error);
     return {};
   }
 }
@@ -57,61 +57,67 @@ export default async function Dashboard() {
   const boardData = await getDashboardData();
 
   return (
-    // 1. L'écran entier est verrouillé en hauteur (h-screen) sans défilement global (overflow-hidden)
-    <main className="h-screen flex flex-col bg-slate-50 p-4 md:p-6 font-sans text-slate-800 overflow-hidden">
+    <main className="h-screen flex flex-col bg-slate-50 p-4 font-sans text-slate-800 overflow-hidden">
       
-      {/* 2. L'en-tête garde sa taille fixe (flex-shrink-0) */}
-      <header className="flex-shrink-0 mb-6 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4 md:gap-6">
-          <img src="/logo.png" alt="Avisia Logo" className="h-8 md:h-10 object-contain" />
-          <div className="hidden md:block h-10 w-px bg-slate-200"></div>
-          <div>
-            <h1 className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">Suivi Pipe Business</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="flex h-2 w-2 rounded-full bg-[#2634E5]"></span>
-              <p className="text-xs md:text-sm text-slate-500">Connecté en temps réel à Notion</p>
-            </div>
-          </div>
+      {/* Header plus compact pour laisser de la place aux données */}
+      <header className="flex-shrink-0 mb-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <img src="/logo.png" alt="Avisia Logo" className="h-8 object-contain" />
+          <div className="h-8 w-px bg-slate-200"></div>
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900">Suivi Pipe Business</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="flex h-2 w-2 rounded-full bg-[#2634E5] animate-pulse"></span>
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Live Notion</p>
         </div>
       </header>
 
-      {/* 3. Le Container de la Grille prend tout l'espace restant (flex-1) */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {Object.entries(boardData).map(([statut, entreprises]) => (
-          
-          // 4. Chaque colonne est verrouillée en hauteur (h-full, overflow-hidden)
-          <div key={statut} className="bg-slate-200/50 rounded-xl p-4 border border-slate-200/60 flex flex-col h-full overflow-hidden">
-            
-            <div className="flex-shrink-0 flex items-center justify-between mb-4 px-1">
-              <h2 className="font-bold text-sm text-slate-800 tracking-wide uppercase">{statut}</h2>
-              <span className="bg-[#2634E5] text-white text-xs py-1 px-2.5 rounded-full font-semibold shadow-sm">
-                {/* @ts-ignore */}
-                {entreprises.length}
-              </span>
-            </div>
+      {/* GRILLE EN 2 COLONNES (2 blocs à gauche, 2 blocs à droite) */}
+      <div className="flex-1 grid grid-cols-2 gap-4 min-h-0">
+        
+        {/* COLONNE GAUCHE : Nouveau & En cours */}
+        <div className="flex flex-col gap-4 overflow-hidden">
+          <CategoryBlock title="Nouveau" items={boardData["Nouveau"]} color="bg-blue-500" />
+          <CategoryBlock title="En cours" items={boardData["En cours"]} color="bg-orange-500" />
+        </div>
 
-            {/* 5. C'est ici que ça scrolle ! (overflow-y-auto) */}
-            <div className="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 pb-2">
-              {/* @ts-ignore */}
-              {entreprises.map((entreprise: any, index: number) => (
-                <div
-                  key={index}
-                  className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 transition-all duration-200 cursor-default hover:shadow-md hover:border-[#2634E5] hover:-translate-y-0.5 group flex-shrink-0"
-                >
-                  <p className="font-medium text-slate-700 group-hover:text-[#2634E5] transition-colors">{entreprise}</p>
-                </div>
-              ))}
-              
-              {/* @ts-ignore */}
-              {entreprises.length === 0 && (
-                <div className="text-slate-400 text-sm text-center py-6 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50/50">
-                  Aucune offre
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+        {/* COLONNE DROITE : GO & NO GO */}
+        <div className="flex flex-col gap-4 overflow-hidden">
+          <CategoryBlock title="GO" items={boardData["GO"]} color="bg-emerald-500" />
+          <CategoryBlock title="NO GO" items={boardData["NO GO"]} color="bg-rose-500" />
+        </div>
+
       </div>
     </main>
+  );
+}
+
+// Composant pour chaque bloc de catégorie
+function CategoryBlock({ title, items, color }: { title: string, items: string[], color: string }) {
+  return (
+    <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+      <div className="flex-shrink-0 flex items-center justify-between p-3 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center gap-2">
+          <div className={`w-1.5 h-4 ${color} rounded-full`}></div>
+          <h2 className="font-bold text-sm text-slate-700 uppercase tracking-wide">{title}</h2>
+        </div>
+        <span className="bg-slate-200 text-slate-700 text-xs py-0.5 px-2 rounded-md font-bold">
+          {items.length}
+        </span>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto p-3">
+        <div className="grid grid-cols-1 gap-2">
+          {items.map((item, index) => (
+            <div key={index} className="bg-white p-3 rounded-lg border border-slate-150 shadow-sm hover:border-[#2634E5] transition-colors">
+              <p className="text-sm font-semibold text-slate-700">{item}</p>
+            </div>
+          ))}
+          {items.length === 0 && (
+            <p className="text-center text-slate-400 text-xs py-4 italic">Aucun élément</p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
