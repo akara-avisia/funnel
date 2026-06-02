@@ -64,29 +64,69 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, [currentView]);
 
+  // --- NOUVEAU : Fonctions pour les flèches manuelles ---
+  const handlePrev = () => {
+    setCurrentView((prev) => (prev === 0 ? 2 : prev - 1));
+    setProgress(0); // Remet la barre bleue à zéro
+  };
+
+  const handleNext = () => {
+    setCurrentView((prev) => (prev === 2 ? 0 : prev + 1));
+    setProgress(0); // Remet la barre bleue à zéro
+  };
+
   const finalBoardData: Record<string, string[]> = {};
   if (notionData) {
     Object.entries(notionData).forEach(([statut, entreprises]: any) => {
-      if (entreprises.length > MAX_ITEMS) {
-        const nbColonnes = Math.ceil(entreprises.length / MAX_ITEMS);
+      // --- NOUVEAU : Limiter les NO GO aux 5 plus récents ---
+      let itemsToDisplay = entreprises;
+      if (statut.startsWith("NO GO")) {
+        itemsToDisplay = itemsToDisplay.slice(0, 5);
+      }
+
+      if (itemsToDisplay.length > MAX_ITEMS) {
+        const nbColonnes = Math.ceil(itemsToDisplay.length / MAX_ITEMS);
         for (let i = 0; i < nbColonnes; i++) {
-          const chunk = entreprises.slice(i * MAX_ITEMS, (i + 1) * MAX_ITEMS);
+          const chunk = itemsToDisplay.slice(i * MAX_ITEMS, (i + 1) * MAX_ITEMS);
           finalBoardData[`${statut} (${i + 1}/${nbColonnes})`] = chunk;
         }
       } else {
-        finalBoardData[statut] = entreprises;
+        finalBoardData[statut] = itemsToDisplay;
       }
     });
   }
 
+  // NOUVEAU : Ajout de "relative" dans le className du main pour les flèches flottantes
   return (
-    <main className="h-screen bg-white font-sans text-slate-800 overflow-hidden flex flex-col">
+    <main className="h-screen bg-white font-sans text-slate-800 overflow-hidden flex flex-col relative">
       
       <div className="h-1 w-full bg-slate-100 flex-shrink-0">
         <div 
           className="h-full bg-[#2634E5] transition-all duration-100 ease-linear"
           style={{ width: `${progress}%` }}
         ></div>
+      </div>
+
+      {/* ==========================================
+          NOUVEAU : BOUTONS FLÉCHÉS FLOTTANTS
+          ========================================== */}
+      <div className="absolute bottom-6 right-6 flex items-center gap-3 z-50 opacity-30 hover:opacity-100 transition-opacity duration-300">
+        <button 
+          onClick={handlePrev} 
+          className="bg-white text-slate-600 hover:bg-[#2634E5] hover:text-white p-3 rounded-full shadow-lg border border-slate-200 transition-colors flex items-center justify-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+        <button 
+          onClick={handleNext} 
+          className="bg-white text-slate-600 hover:bg-[#2634E5] hover:text-white p-3 rounded-full shadow-lg border border-slate-200 transition-colors flex items-center justify-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
       </div>
 
       {/* ==========================================
