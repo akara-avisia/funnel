@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 // --- CONFIGURATION ---
-const DUREE_PAGE = 30000; // 30 secondes
+const DUREE_PAGE = 45000; // 45 secondes
 // 👇 COLLES TON LIEN GOOGLE AGENDA CI-DESSOUS 👇
 const URL_AGENDA = "https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Europe%2FParis&showPrint=0&src=Z3JvdXBlLWF2aXNpYS5mcl9tdHVrNjYxYmVvbm45cHJlYTg2a2s5a2Y1MEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZnIuZnJlbmNoI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23f4511e&color=%230b8043"; 
 // 👇 COLLES TON LIEN GOOGLE DRIVE CI-DESSOUS (bien finir par /preview) 👇
